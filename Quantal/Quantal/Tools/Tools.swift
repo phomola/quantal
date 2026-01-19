@@ -6,18 +6,13 @@
 //
 
 import Foundation
+import FoundationModels
 
 struct DynamicTool {
-    let name: String
-    let description: String
-    let arguments: [Argument]
-    
-    struct Argument {
-        let name: String
-        let guide: String
-    }
+    let info: String
+    let tool: any Tool
 }
 
-protocol ToolManager {
-    func pickTool(for query: String) -> DynamicTool
+protocol ToolManaging {
+    func pickTool(for query: String) -> DynamicTool?
 }
