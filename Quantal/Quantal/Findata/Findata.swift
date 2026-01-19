@@ -45,6 +45,31 @@ struct Candle: Identifiable {
     var id: Int { index }
 }
 
+struct FetchJob {
+    let symbol: String
+    let from: Date
+    let to: Date
+    let interval: Interval
+}
+
 protocol DataProvider {
     func fetchData(symbol: String, from: Date, to: Date, interval: Interval) async throws -> ([Candle], DataMeta)
+}
+
+extension DataProvider {
+    func fetchData(jobs: [FetchJob]) async throws -> [[Candle]] {
+        try await withThrowingTaskGroup { group in
+            for job in jobs {
+                group.addTask {
+                    try await fetchData(symbol: job.symbol, from: job.from, to: job.to, interval: job.interval)
+                }
+            }
+            var allCandles: [[Candle]] = []
+            allCandles.reserveCapacity(jobs.count)
+            for try await (candles, _) in group {
+                allCandles.append(candles)
+            }
+            return allCandles
+        }
+    }
 }
