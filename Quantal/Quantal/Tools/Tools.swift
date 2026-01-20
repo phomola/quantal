@@ -13,6 +13,7 @@ struct DynamicTool {
     let tool: any Tool
 }
 
-protocol ToolManaging {
+protocol ToolManagement {
+    func add(tool: any Tool) throws
     func pickTool(for query: String) -> DynamicTool?
 }
