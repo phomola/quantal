@@ -8,6 +8,7 @@
 import Foundation
 import FoundationModels
 
+@available(macOS 26.0, *)
 @Generable(description: "date components")
 struct DateComponents {
     let day: Int
