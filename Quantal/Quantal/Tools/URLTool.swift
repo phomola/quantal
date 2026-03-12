@@ -9,13 +9,12 @@ import Foundation
 import FoundationModels
 
 enum ServiceError: Error {
-    case badRequest, badUrl, badResponse, badData, noModel
+    case badRequest, badUrl, badResponse, badData
 }
 
 func fetch(from url: URL, input: Data) async throws -> Data {
     try await withCheckedThrowingContinuation { continuation in
         var request = URLRequest(url: url)
-        //request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
         request.httpBody = input
         let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
@@ -25,7 +24,7 @@ func fetch(from url: URL, input: Data) async throws -> Data {
                 if response.statusCode == 200 {
                     continuation.resume(returning: data)
                 } else {
-                    print("status code: \(response.statusCode)")
+                    print("unexpected status code: \(response.statusCode)")
                     continuation.resume(throwing: ServiceError.badResponse)
                 }
             } else {
@@ -49,8 +48,7 @@ struct URLTool: Tool {
         self.description = description
         guard let url = URL(string: urlString) else { throw ServiceError.badUrl }
         self.url = url
-        self.parameters = schema //try GenerationSchema(root: schema, dependencies: [])
-        //print(self.parameters.debugDescription)
+        self.parameters = schema
     }
     
     typealias Arguments = GeneratedContent
@@ -59,7 +57,6 @@ struct URLTool: Tool {
         print("tool invoked: \(url) / \(arguments.jsonString)")
         guard let input = arguments.jsonString.data(using: .utf8) else { throw ServiceError.badData }
         guard let output = String(data: try await fetch(from: url, input: input), encoding: .utf8) else { throw ServiceError.badData }
-        //print(output)
         return output
     }
 }
