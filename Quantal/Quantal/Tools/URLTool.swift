@@ -9,7 +9,7 @@ import Foundation
 import FoundationModels
 
 enum ServiceError: Error {
-    case badRequest, badUrl, badResponse, badData
+    case badRequest, badUrl, badResponse, badData, badContext
 }
 
 func fetch(from url: URL, input: Data) async throws -> Data {
@@ -54,7 +54,7 @@ struct URLTool: Tool {
     typealias Arguments = GeneratedContent
     
     func call(arguments: Arguments) async throws -> String {
-        print("tool invoked: \(url) / \(arguments.jsonString)")
+        print("tool invoked: \(name) / \(arguments.jsonString)")
         guard let input = arguments.jsonString.data(using: .utf8) else { throw ServiceError.badData }
         guard let output = String(data: try await fetch(from: url, input: input), encoding: .utf8) else { throw ServiceError.badData }
         return output
