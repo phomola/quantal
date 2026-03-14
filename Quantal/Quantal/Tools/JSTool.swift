@@ -27,11 +27,31 @@ struct JSTool: Tool {
     
     func call(arguments: Arguments) async throws -> GeneratedContent {
         print("tool invoked: \(name) / \(arguments.jsonString)")
-        guard let input = arguments.jsonString.data(using: .utf8) else { throw ServiceError.badData }
-        let inputDict = try JSONSerialization.jsonObject(with: input)
-        let result = try await callAsync(function: self.function, arguments: [inputDict])
-        let json = try JSONSerialization.data(withJSONObject: result)
+        let result = try await callAsync(function: self.function, arguments: [LLMDict(content: arguments)])
+        guard let output = result.toObject() as? NSDictionary else { throw ServiceError.badValue }
+        let json = try JSONSerialization.data(withJSONObject: output)
         return try GeneratedContent(json: String(data: json, encoding: .utf8) ?? "{}")
+    }
+}
+
+@objc protocol LLMDictProtocol: JSExport {
+    func getString(for key: String) -> String
+}
+
+@available(macOS 26.0, *)
+class LLMDict: NSObject, LLMDictProtocol {
+    let content: GeneratedContent
+    
+    init(content: GeneratedContent) {
+        self.content = content
+    }
+    
+    func getString(for key: String) -> String {
+        do {
+            return try self.content.value(String.self, forProperty: key)
+        } catch {
+            return ""
+        }
     }
 }
 

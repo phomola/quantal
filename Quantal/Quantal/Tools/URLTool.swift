@@ -9,7 +9,7 @@ import Foundation
 import FoundationModels
 
 enum ServiceError: Error {
-    case badRequest, badUrl, badResponse, badData, badContext
+    case badRequest, badUrl, badResponse, badData, badContext, badValue
 }
 
 func fetch(from url: URL, input: Data) async throws -> Data {
