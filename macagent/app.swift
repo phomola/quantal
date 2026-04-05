@@ -2,7 +2,7 @@ import Foundation
 
 @main
 struct App {
-    static func main() throws {
-        try runREPL()
+    static func main() async throws {
+        try await runREPL()
     }
 }
