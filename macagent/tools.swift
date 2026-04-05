@@ -3,18 +3,20 @@ import FoundationModels
 @preconcurrency import NaturalLanguage
 
 struct ProxyTool: Tool {
-    let description = "Invoke this tool to perform external actions. Provide the whole user prompt, don't extract pieces from it."
+    let description = "Invoke this proxy tool to perform external actions."
     let embedding: NLEmbedding
     let model: SystemLanguageModel
+    let context: Context
     let skills: [Skill] = [
         OpenAppSkill(),
         WebSearchSkill(),
+        MTSkill(),
     ]
 
     @Generable
     struct Arguments {
-        @Guide(description: "The whole original user prompt. Provide the whole user prompt, don't extract pieces from it.")
-        let originalPrompt: String
+        // @Guide(description: "The parts of the original user input in its full length.")
+        // let query: String
     }
 
     struct RatedSkill {
@@ -23,7 +25,8 @@ struct ProxyTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        let query = arguments.originalPrompt
+        // let query = arguments.query
+        guard let query = await context.input else { throw AgentError.missingUserInput }
         print("proxy tool query: '\(query)'")
         var ratedSkills: [RatedSkill] = []
         ratedSkills.reserveCapacity(skills.count)
