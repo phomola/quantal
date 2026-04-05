@@ -3,17 +3,18 @@ import FoundationModels
 @preconcurrency import NaturalLanguage
 
 struct ProxyTool: Tool {
-    let description = "Invoke this tool to perform external actions."
+    let description = "Invoke this tool to perform external actions. Provide the whole user prompt, don't extract pieces from it."
     let embedding: NLEmbedding
     let model: SystemLanguageModel
     let skills: [Skill] = [
         OpenAppSkill(),
+        WebSearchSkill(),
     ]
 
     @Generable
     struct Arguments {
-        @Guide(description: "The original user query.")
-        let query: String
+        @Guide(description: "The whole original user prompt. Provide the whole user prompt, don't extract pieces from it.")
+        let originalPrompt: String
     }
 
     struct RatedSkill {
@@ -22,7 +23,7 @@ struct ProxyTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        let query = arguments.query
+        let query = arguments.originalPrompt
         print("proxy tool query: '\(query)'")
         var ratedSkills: [RatedSkill] = []
         ratedSkills.reserveCapacity(skills.count)
@@ -35,10 +36,11 @@ struct ProxyTool: Tool {
             let skill = ratedSkill.skill
             let session = LanguageModelSession(model: model, tools: [skill.tool])
             do {
-                let response = try await session.respond(to: query)
-                return response.content
+                let response = try await session.respond(to: query, generating: SkillResult.self)
+                if !response.content.success { print("skill failed") }
+                return response.content.message
             } catch {
-                print("tool error: \(error)")
+                print("skill error: \(error)")
             }
         }
         throw AgentError.noSuitableSkill
