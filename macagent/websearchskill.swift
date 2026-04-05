@@ -6,7 +6,7 @@ struct WebSearchSkill: Skill {
         Searches information on the internet using a web browser.
 
         Arguments:
-        
+
         phrase (string): The phrase to search for.
         """
     let tool: any Tool = SkillTool()
@@ -40,3 +40,5 @@ struct WebSearchSkill: Skill {
         }
     }
 }
+
+// Example: Search for "Argentinian Andes" on the web.

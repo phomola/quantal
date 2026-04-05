@@ -3,10 +3,10 @@ import FoundationModels
 
 struct OpenAppSkill: Skill {
     let description = """
-        Opens an application on the running system.
+        Opens an application on the running system. The app is open using AppleScript.
 
         Arguments:
-        
+
         appName (string): The name of the application.
         """
     let tool: any Tool = SkillTool()
