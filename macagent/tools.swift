@@ -15,8 +15,6 @@ struct ProxyTool: Tool {
 
     @Generable
     struct Arguments {
-        // @Guide(description: "The parts of the original user input in its full length.")
-        // let query: String
     }
 
     struct RatedSkill {
@@ -25,7 +23,6 @@ struct ProxyTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        // let query = arguments.query
         guard let query = await context.input else { throw AgentError.missingUserInput }
         print("proxy tool query: '\(query)'")
         var ratedSkills: [RatedSkill] = []
