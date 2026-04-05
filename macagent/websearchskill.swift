@@ -4,7 +4,9 @@ import FoundationModels
 struct WebSearchSkill: Skill {
     let description = """
         Searches information on the internet using a web browser.
+
         Arguments:
+        
         phrase (string): The phrase to search for.
         """
     let tool: any Tool = SkillTool()

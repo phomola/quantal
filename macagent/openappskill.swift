@@ -4,7 +4,9 @@ import FoundationModels
 struct OpenAppSkill: Skill {
     let description = """
         Opens an application on the running system.
+
         Arguments:
+        
         appName (string): The name of the application.
         """
     let tool: any Tool = SkillTool()

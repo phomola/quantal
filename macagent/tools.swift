@@ -37,8 +37,8 @@ struct ProxyTool: Tool {
             let session = LanguageModelSession(model: model, tools: [skill.tool])
             do {
                 let response = try await session.respond(to: query, generating: SkillResult.self)
-                if response.content.success { return response.content.message }
-                print("skill failed: \(response.content.message)")
+                if !response.content.success { print("skill failed") }
+                return response.content.message
             } catch {
                 print("skill error: \(error)")
             }
