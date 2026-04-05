@@ -7,8 +7,12 @@ func runREPL() async throws {
     while let input = readLine() {
         let input = input.trimmingCharacters(in: .whitespacesAndNewlines)
         if input == "" { continue }
-        let response = try await agent.session.respond(to: input)
-        print("\n\(response.content)")
+        do {
+            let response = try await agent.session.respond(to: input)
+            print("\n\(response.content)")
+        } catch {
+            print("\nerror: \(error)")
+        }
         print("\n>", terminator: " ")
     }
 }
