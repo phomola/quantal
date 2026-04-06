@@ -24,18 +24,11 @@ struct OpenAppSkill: Skill {
             let appName = arguments.appName
             print("open app skill: '\(appName)'")
             return await MainActor.run {
-                guard let script = NSAppleScript(source: """
+                return run(appleScript: """
                     tell application "\(appName)"
                         activate
                     end tell
-                    """) else { return SkillResult(message: "AppleScript couldn't be created.", success: false) }
-                var errorInfo: NSDictionary? = nil
-                script.executeAndReturnError(&errorInfo)
-                if errorInfo == nil {
-                    return SkillResult(message: "App opened.", success: true)
-                } else {
-                    return SkillResult(message: errorInfo?[NSAppleScript.errorMessage] as? String ?? "Unknown AppleScript error.", success: false)
-                }
+                    """, successMessage: "App opened.")
             }
         }
     }

@@ -24,18 +24,11 @@ struct WebSearchSkill: Skill {
             let phrase = arguments.phrase
             print("web search skill: '\(phrase)'")
             return await MainActor.run {
-                guard let script = NSAppleScript(source: """
+                return run(appleScript: """
                     tell application "Safari"
                         search the web for "\(phrase)"
                     end tell
-                    """) else { return SkillResult(message: "AppleScript couldn't be created.", success: false) }
-                var errorInfo: NSDictionary? = nil
-                script.executeAndReturnError(&errorInfo)
-                if errorInfo == nil {
-                    return SkillResult(message: "Search performed in Safari.", success: true)
-                } else {
-                    return SkillResult(message: errorInfo?[NSAppleScript.errorMessage] as? String ?? "Unknown AppleScript error.", success: false)
-                }
+                    """, successMessage: "Search performed in Safari.")
             }
         }
     }
