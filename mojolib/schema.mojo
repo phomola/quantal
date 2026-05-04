@@ -1,4 +1,3 @@
-from std.reflection import get_type_name, struct_field_count, struct_field_names, struct_field_types
 from std.builtin.rebind import downcast
 from std.sys import stdout
 from std.sys.intrinsics import _type_is_eq
@@ -33,13 +32,14 @@ struct JSONSchema(Movable, JSONEncodable):
 trait JSONSchemaInferrible:
     @staticmethod
     def inferred_json_schema() -> JSONSchema:
-        comptime type_name = get_type_name[Self]()
+        comptime rfl = reflect[Self]()
+        comptime type_name = rfl.name()
         var properties = Dict[String, ArcPointer[JSONSchema]]()
         var required = List[String]()
         var x_order = List[String]()
-        comptime field_count = struct_field_count[Self]()
-        comptime field_names = struct_field_names[Self]()
-        comptime field_types = struct_field_types[Self]()
+        comptime field_count = rfl.field_count()
+        comptime field_names = rfl.field_names()
+        comptime field_types = rfl.field_types()
         comptime descs = Self.field_descriptions()
         comptime for idx in range(field_count):
             comptime field_name = field_names[idx]
@@ -157,8 +157,9 @@ struct Person(Movable, Writable, JSONEncodable, JSONSchemaInferrible):
 
 trait JSONEncodable:
     def write_json(self, fd: FileDescriptor):
-        comptime field_count = struct_field_count[Self]()
-        comptime field_names = struct_field_names[Self]()
+        comptime rfl = reflect[Self]()
+        comptime field_count = rfl.field_count()
+        comptime field_names = rfl.field_names()
         print("{", end="", file=fd)
         var first = True
         comptime for idx in range(field_count):
